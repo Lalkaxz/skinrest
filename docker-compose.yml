@@ -1,0 +1,42 @@
+services:
+  api:
+    container_name: go-skinrest-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./logs:/root/logs
+    depends_on:
+      - db
+    environment:
+      SERVER_HOST: "localhost"
+      SERVER_PORT: "8081"
+      DATABASE_DRIVER: "postgres"
+      DATABASE_HOST: dockerPostgres
+      GIN_MODE: "debug" # or "release"
+      DATABASE_PORT: "5432"
+      DATABASE_USER: "postgres"
+      API_ENV: "docker" # or "local"
+      DATABASE_PASSWORD: "0000"
+      DATABASE_NAME: "skinRestDB"
+      DATABASE_SSL: "disable"
+      AUTH_JWT_SECRET: "8ddeefb1f8c17f17864b0512c5148319848614a11efaed0b247c5cb2e19122e2"
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    container_name: dockerPostgres
+    volumes:
+      - .dbdata:/var/lib/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "skinRestDB"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "0000"
+    command: -p 5432
+
+volumes:
+  dbdata:
